@@ -5,43 +5,25 @@
  * @argv: argument vector
  *
  */
-void excom(char **argv)
+int get_excom(char **mycomm, char **argv)
 {
-	char *mycomm = NULL, *lastcom = NULL;
-	pid_t mypid = fork();
+	pid_t pid;
+	int stat, i;
 
-	if (argv)
+	pid = fork();
+	if (pid == 0)
 	{
-		mycomm = argv[0];
-		if (_strcmp(mycomm, "exit") == 0)
+		if (execve(mycomm[0], mycomm, environ) == -1)
 		{
-			exit(127);
-		}
-
-		if (mypid < 0)
-		{
-			perror("Fork failed:");
-			exit(127);
-		}
-		else if (mypid == 0)
-		{
-			lastcom = getmy_loc(mycomm);
-
-			if (lastcom == NULL)
-			{
-				exit(1);
-			}
-			if (execve(lastcom, argv, NULL) == -1)
-			{
-				perror("There is an Error:");
-				free(lastcom);
-				exit(1);
-			}
-		}
-		else
-		{
-			wait(NULL);
+			perror(argv[0]);
+			free(mycomm);
+			exit(1);
 		}
 	}
-	free(lastcom);
+	else
+	{
+		waitpid(pid, &stat, 0);
+		free(mycomm);
+	}
+	return (WEXITSTATUS(stat));
 }
