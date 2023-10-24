@@ -1,75 +1,46 @@
-#include "main.h"
-
-int main(int ac, char **av);
-
-/**
- * main - Entry point
- * @argc: argument to count
- * @argv: argument vector
- *
- * Return: 0 (success)
- */
-int main(int ac, char **av)
+#include "shell.h"
+char *read_line()
 {
-	char *stradd = NULL, *stradd_cpy = NULL;
-	size_t n = 0;
-	ssize_t retval;
-	const char *del = " \n";
-	int cntok = 0;
-	char *tok;
-	int x;
+	char *read = NULL;
+	size_t count = 0;
+	ssize_t n_char;
 
+	if (isatty(0))
+		write(1, "$ ", 3);
+	n_char = getline(&read, &count, stdin);
+	if (n_char == -1)
+	{
+		free(read), read = NULL;
+		return (NULL);
+	}
+	return (read);
+}
+
+
+int main(int ac, char **argv)
+{
+	char *read = NULL;
+	char **cmd = NULL;
+	int stat = 0, num = 0;
 	(void)ac;
-	myenv();
 
 	while (1)
 	{
-		if (isatty(0))
-			write(STDOUT_FILENO, "(darkshell)$ ", 13);
-		retval = getline(&stradd, &n, stdin);
-
-		if (retval == -1)
+		read = read_line();
+		if (read == NULL)
 		{
 			if (isatty(0))
-				_puts("\n");
-			free(stradd), stradd = NULL;
-			return (-1);
+				write(1, "\n", 2);
+			return (stat);
 		}
-		stradd_cpy = malloc(sizeof(char) * (retval + 2));
+		num++;
 
-		if (stradd_cpy == NULL)
-		{
-			perror("memory allocation error");
-			return (-1);
-		}
-
-		_strcpy(stradd_cpy, stradd);
-
-		tok = strtok(stradd, del);
-		while (tok != NULL)
-		{
-			cntok++;
-			tok = strtok(NULL, del);
-		}
-		cntok++;
-
-		av = malloc(sizeof(char *) * cntok);
-
-		tok = strtok(stradd_cpy, del);
-
-		for (x = 0; tok != NULL; x++)
-		{
-			av[x] = malloc(sizeof(char) * (_strlen(tok) + 1));
-			_strcpy(av[x], tok);
-
-			tok = strtok(NULL, del);
-		}
-		av[x] = NULL;
-
-		excom(av);
-		free(av);
+		cmd = splitazer(read);
+		if (!cmd)
+			continue;
+		if (_binaya_ton(cmd[0]))
+			_bin_handlon(cmd, argv, &stat, num);
+		else
+			stat = execute(cmd, argv, num);
 	}
-	free(stradd);
-	free(stradd_cpy);
-	return (0);
 }

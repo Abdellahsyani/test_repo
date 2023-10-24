@@ -1,35 +1,55 @@
 #include "shell.h"
-
-/**
- * excom - function for command execution
- * @argv: argument vector
- *
- */
-<<<<<<< HEAD
-int excom(char **argv, char **mycomm)
+void error_one(char *ism, char *cmd, int num)
 {
+	char *ofdix;
+	ofdix = _itoa(num);
 
-=======
-int get_excom(char **mycomm, char **argv)
+	write(1, ism, _strlen(ism));
+	write(1, ": ", 3);
+	write(1, ofdix, _strlen(ofdix));
+	write(1, ": ", 3);
+	write(1, cmd, _strlen(cmd));
+	write(1, ": not found\n", 13);
+	free(ofdix);
+}
+
+int execute(char **cmd, char **argv, int num)
 {
-	pid_t pid;
-	int stat, i;
+	char *allcmd;
+	pid_t child;
+	int status;
 
-	pid = fork();
-	if (pid == 0)
+	allcmd = handle_path(cmd[0]);
+	if (!allcmd)
 	{
-		if (execve(mycomm[0], mycomm, environ) == -1)
+		/*char *res = argv[0];
+		char *res1 = cmd[0];
+		char *ofdix;
+		ofdix = _itoa(num);
+		write(1, res, _strlen(res));
+		write(1, ": ", 3);
+		write(1, res1, _strlen(res1));
+		write(1, ": ", 3);
+		write(1, ofdix, _strlen(ofdix));
+		write(1, ": not found\n", 13);*/
+		error_one(argv[0], cmd[0], num);
+		free2D(cmd);
+		return (127);
+	 }
+	child = fork();
+	if (child == 0)
+	{
+		if (execve(allcmd, cmd, environ) == -1)
 		{
-			perror(argv[0]);
-			free(mycomm);
-			exit(1);
+			free(allcmd), allcmd = NULL;
+			free2D(cmd);
 		}
 	}
 	else
 	{
-		waitpid(pid, &stat, 0);
-		free(mycomm);
+		waitpid(child, &status, 0);
+		free2D(cmd);
+		free(allcmd), allcmd = NULL;
 	}
-	return (WEXITSTATUS(stat));
+	return (WEXITSTATUS(status));
 }
->>>>>>> 0daf757094a348eca7fe8ce7cad7723a6b18b698
