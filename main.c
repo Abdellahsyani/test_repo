@@ -1,5 +1,5 @@
 #include "shell.h"
-char *read_line()
+char *read_line(void)
 {
 	char *read = NULL;
 	size_t count = 0;

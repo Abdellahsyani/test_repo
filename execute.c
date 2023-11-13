@@ -16,8 +16,8 @@ void error_one(char *ism, char *cmd, int num)
 int execute(char **cmd, char **argv, int num)
 {
 	char *allcmd;
-	pid_t child;
-	int status;
+	pid_t pid;
+	int stat;
 
 	allcmd = handle_path(cmd[0]);
 	if (!allcmd)
@@ -36,8 +36,8 @@ int execute(char **cmd, char **argv, int num)
 		free2D(cmd);
 		return (127);
 	 }
-	child = fork();
-	if (child == 0)
+	pid = fork();
+	if (pid == 0)
 	{
 		if (execve(allcmd, cmd, environ) == -1)
 		{
@@ -47,9 +47,9 @@ int execute(char **cmd, char **argv, int num)
 	}
 	else
 	{
-		waitpid(child, &status, 0);
+		waitpid(pid, &stat, 0);
 		free2D(cmd);
 		free(allcmd), allcmd = NULL;
 	}
-	return (WEXITSTATUS(status));
+	return (WEXITSTATUS(stat));
 }

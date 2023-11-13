@@ -26,7 +26,6 @@ void _bin_handlon(char **cmd, char **argv, int *stat, int num);
 void _quit_pro(char **cmd, int *stat);
 void _environ_write(char **cmd, int *stat);
 /*all suport function*/
-void rev_str(char *str, int len);
 char *_itoa(int n);
 int _strncmp(const char *S1, const char *S2, size_t num);
 void free2D(char **arr);
